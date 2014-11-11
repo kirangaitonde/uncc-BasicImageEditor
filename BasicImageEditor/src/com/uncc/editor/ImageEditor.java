@@ -11,6 +11,8 @@
  *  
  * @author Kiran Gaitonde
  * 
+ * References docs.oracle.com, stackoverflow.com
+ * 
  */
 
 package com.uncc.editor;
