@@ -3,9 +3,11 @@
  * 
  * Allows the user to select an image from the system.
  * 
- * Next it allows the user to select points on the image with  left click of mouse.
+ * Next it allows the user to draw lines on the image using left click of mouse.
  * 
- * At right click it creates a new image having a polygon with vertices at selected points.
+ * The user can delete the last drawn line using right click.
+ * 
+ * Double right click to to draw a polygon using drawn lines.
  * 
  * The polygon is filled with white and the rest of the image is filled with black
  *  
@@ -45,6 +47,7 @@ public class ImageEditor extends Application {
     	final FileChooser fileChooser = new FileChooser();
     	final Screen        screen      = Screen.getPrimary();
     	final Rectangle2D   bounds      = screen.getVisualBounds();
+    	//final Keyboard k = new Keyboard(new Key(KeyCode.A));
     	
     	HBox hb = new HBox(10); 
     	
@@ -84,17 +87,37 @@ public class ImageEditor extends Application {
             public void handle(MouseEvent event) {
             	
             	
-                if (event.isSecondaryButtonDown()) {
-                	setNewHB(hb,getImage(),arrayList);
+                if (event.isSecondaryButtonDown()) 
+                {   
+                	// draw polygon
+                	if(event.getClickCount() == 2)
+                	{
+                		setNewHB(hb,getImage(),arrayList);
+                        
+                	}
+                	
+                	//delete previous line
+                	else{
+                		
+                		if(arrayList.size()>1)
+                		{
+                		arrayList.remove(arrayList.size()-1);
+                		arrayList.remove(arrayList.size()-1);
+                		setHB(hb,getImage(),arrayList);
+                		}
+                		//displayArrayList(arrayList);
+                		
+                	}
                 	
                 }
                 else{
-                	System.out.print("listened ");
+                	//System.out.print("listened ");
                 	Double x = event.getX();                	
-                	Double y = event.getY();
-                	
+                	Double y = event.getY();                	
                 	arrayList.add(x);                	
                 	arrayList.add(y);  
+                	//displayArrayList(arrayList);
+                	setHB(hb,getImage(),arrayList);
                 	
                 }
             }
@@ -120,6 +143,44 @@ public class ImageEditor extends Application {
 		hb.getChildren().add(canvas1);
 		VBox.setVgrow(hb, Priority.ALWAYS);
 		HBox.setHgrow(canvas1, Priority.ALWAYS); 
+    	
+        return hb;
+    }
+    
+    //to set lines on the points selected
+    private HBox setHB(HBox hb, Image img, ArrayList<Double> a)
+    {   
+    	hb.getChildren().clear();
+    	int m = a.size();
+    	int n = m/2;
+    	double[] b = new double[n];
+    	double[] c = new double[n];
+    	int p=0;
+		int q=0;
+		
+    	for (int i = 0; i < a.size(); i++)
+    	{
+    		b[p]= a.get(i);
+    		i++;
+    		p++;
+    	}
+    	for (int j = 1; j < a.size(); j++)
+    	{
+    		c[q]= a.get(j);
+    		j++;
+    		q++;
+    	}    	 	
+    	Canvas canvas3 = new Canvas(img.getWidth(), img.getHeight());
+		GraphicsContext gc3 = canvas3.getGraphicsContext2D();
+		gc3.drawImage(img,0,0);
+		gc3.setFill(Color.BLACK);
+		gc3.setLineWidth(2);
+		for (int i = 0; i < n-1; i++)
+		{
+			gc3.strokeLine(b[i], c[i], b[i+1],c[i+1]);	
+		}
+		hb.getChildren().add(canvas3);		
+		HBox.setHgrow(canvas3, Priority.ALWAYS); 
     	
         return hb;
     }
@@ -173,11 +234,11 @@ public class ImageEditor extends Application {
     	}
     	 for (int i = 0; i < a.size(); i++)
 		    {	
-    		 System.out.println("visited for loop ");
+    		 //System.out.println("visited for loop ");
 		     System.out.print(b[i]+" ");
 		     }   	
     	
-    }    
+    }   
     
     public void setImage(Image i)
 	{
